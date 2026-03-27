@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Model weights & large files
+*.bin
+*.pt
+*.pth
+*.safetensors
+*.gguf
+cache/
+
+# Results & logs
+results/
+wandb/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
