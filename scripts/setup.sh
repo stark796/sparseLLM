@@ -5,7 +5,7 @@
 
 set -e
 
-VENV_DIR="$HOME/venv"
+VENV_DIR="$HOME/sparsellm"
 
 # Create venv if it doesn't exist
 if [ ! -d "$VENV_DIR" ]; then

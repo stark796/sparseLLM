@@ -12,7 +12,7 @@
 set -e
 
 # Activate venv
-source "$HOME/venv/bin/activate"
+source "$HOME/sparsellm/bin/activate"
 
 RESULTS_DIR="$(cd "$(dirname "$0")/.." && pwd)/results"
 
