@@ -11,6 +11,9 @@
 
 set -e
 
+# Activate venv
+source "$HOME/venv/bin/activate"
+
 RESULTS_DIR="$(cd "$(dirname "$0")/.." && pwd)/results"
 
 # Zero-shot tasks (matching DART Table 1 top section)

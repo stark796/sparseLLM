@@ -7,6 +7,9 @@
 
 set -e
 
+# Activate venv
+source "$HOME/venv/bin/activate"
+
 # --- Configuration ---
 SPARSELLM_DIR="$(cd "$(dirname "$0")/../SparseLLM" && pwd)"
 RESULTS_DIR="$(cd "$(dirname "$0")/.." && pwd)/results"
