@@ -342,7 +342,7 @@ def llama_sparsellm(model, dataloader, dev, args):
     inps = torch.zeros(
         (args.nsamples, model.seqlen, model.config.hidden_size), dtype=dtype, device=dev
     )
-    cache = {"i": 0, "attention_mask": None}
+    cache = {"i": 0, "attention_mask": None, "position_ids": None}
 
     class Catcher(nn.Module):
         def __init__(self, module):
@@ -352,7 +352,8 @@ def llama_sparsellm(model, dataloader, dev, args):
         def forward(self, inp, **kwargs):
             inps[cache["i"]] = inp
             cache["i"] += 1
-            cache["attention_mask"] = kwargs["attention_mask"]
+            cache["attention_mask"] = kwargs.get("attention_mask", None)
+            cache["position_ids"] = kwargs.get("position_ids", None)
             raise ValueError
 
     layers[0] = Catcher(layers[0])
@@ -370,6 +371,7 @@ def llama_sparsellm(model, dataloader, dev, args):
 
     outs = torch.zeros_like(inps)
     attention_mask = cache["attention_mask"]
+    position_ids = cache["position_ids"]
 
     print("Ready.")
 
@@ -413,7 +415,7 @@ def llama_sparsellm(model, dataloader, dev, args):
             for name in subset:
                 handles.append(subset[name].register_forward_hook(add_batch(name)))
             for j in range(args.nsamples):
-                outs[j] = layer(inps[j].unsqueeze(0), attention_mask=attention_mask)[0]
+                outs[j] = layer(inps[j].unsqueeze(0), attention_mask=attention_mask, position_ids=position_ids)[0]
             for h in handles:
                 h.remove()
 
@@ -637,7 +639,7 @@ def llama_sparsellm(model, dataloader, dev, args):
                 training_loss['train_loss'].append(tmp_training_loss.item())
 
         for j in range(args.nsamples):
-            outs[j] = layer(inps[j].unsqueeze(0), attention_mask=attention_mask)[0]
+            outs[j] = layer(inps[j].unsqueeze(0), attention_mask=attention_mask, position_ids=position_ids)[0]
 
         layers[i] = layer.cpu()
         del layer
@@ -770,7 +772,7 @@ def llama_eval(model, testenc, dev, args, dataset: str):
     inps = torch.zeros(
         (nsamples, model.seqlen, model.config.hidden_size), dtype=dtype, device=dev
     )
-    cache = {"i": 0, "attention_mask": None}
+    cache = {"i": 0, "attention_mask": None, "position_ids": None}
 
     class Catcher(nn.Module):
         def __init__(self, module):
@@ -780,7 +782,8 @@ def llama_eval(model, testenc, dev, args, dataset: str):
         def forward(self, inp, **kwargs):
             inps[cache["i"]] = inp
             cache["i"] += 1
-            cache["attention_mask"] = kwargs["attention_mask"]
+            cache["attention_mask"] = kwargs.get("attention_mask", None)
+            cache["position_ids"] = kwargs.get("position_ids", None)
             raise ValueError
 
     layers[0] = Catcher(layers[0])
@@ -798,6 +801,7 @@ def llama_eval(model, testenc, dev, args, dataset: str):
 
     outs = torch.zeros_like(inps)
     attention_mask = cache["attention_mask"]
+    position_ids = cache["position_ids"]
 
     for i in range(len(layers)):
         print(i)
@@ -813,7 +817,7 @@ def llama_eval(model, testenc, dev, args, dataset: str):
                 W.data[torch.abs(W.data) <= thresh] = 0
 
         for j in range(nsamples):
-            outs[j] = layer(inps[j].unsqueeze(0), attention_mask=attention_mask)[0]
+            outs[j] = layer(inps[j].unsqueeze(0), attention_mask=attention_mask, position_ids=position_ids)[0]
         layers[i] = layer.cpu()
         del layer
         torch.cuda.empty_cache()
