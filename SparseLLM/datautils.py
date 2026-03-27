@@ -5,7 +5,7 @@ import random
 import numpy as np
 import torch
 from datasets import load_dataset
-from transformers import AutoTokenizer, LlamaTokenizer
+from transformers import AutoTokenizer
 
 
 def set_seed(seed):
@@ -13,17 +13,7 @@ def set_seed(seed):
     torch.random.manual_seed(seed)
 
 def get_tokenizer(model):
-    if "llama" in model.lower():
-        tokenizer = LlamaTokenizer.from_pretrained(model, use_fast=False)
-        # fix for transformer 4.28.0.dev0 compatibility
-        if tokenizer.bos_token_id != 1 or tokenizer.eos_token_id != 2:
-            try:
-                tokenizer.bos_token_id = 1
-                tokenizer.eos_token_id = 2
-            except AttributeError:
-                pass
-    else:
-        tokenizer = AutoTokenizer.from_pretrained(model, use_fast=False)
+    tokenizer = AutoTokenizer.from_pretrained(model, use_fast=False)
     return tokenizer
 
 def get_wikitext2(nsamples, seed, seqlen, model, tokenizer):

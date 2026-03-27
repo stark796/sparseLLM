@@ -1,60 +1,73 @@
 #!/bin/bash
 # ============================================================
-# Zero-Shot Evaluation of SparseLLM-pruned Models
-# Uses lm-eval-harness to evaluate on the same benchmarks
-# as DART's Appendix B tables.
+# Zero-Shot + Multi-Shot Evaluation (matching DART Table 1)
 #
-# Prerequisites:
-#   pip install lm-eval
+# Zero-shot: BoolQ, RTE, HellaSwag, WinoGrande, ARC-e, ARC-c, OBQA
+# Multi-shot (5-shot): MMLU, GPQA, MedMCQA
 #
-# Run this AFTER run_sparsellm.sh has completed.
+# Prerequisites: pip install lm-eval
+# Run AFTER run_sparsellm.sh
 # ============================================================
 
 set -e
 
 RESULTS_DIR="$(cd "$(dirname "$0")/.." && pwd)/results"
 
-# Zero-shot tasks matching DART's evaluation (Table 4 & 5 in Appendix B)
-TASKS="boolq,rte,hellaswag,winogrande,arc_easy,arc_challenge,openbookqa"
+# Zero-shot tasks (matching DART Table 1 top section)
+ZEROSHOT_TASKS="boolq,rte,hellaswag,winogrande,arc_easy,arc_challenge,openbookqa"
 
-# Models and sparsity levels (must match run_sparsellm.sh)
+# Domain-specific 5-shot tasks (matching DART Table 1 bottom section)
+FEWSHOT_TASKS="mmlu,gpqa,medmcqa"
+
+# Configs: model:sparsity (must match run_sparsellm.sh)
 CONFIGS=(
-    "Llama-2-7b-hf:70"
-    "Llama-2-7b-hf:80"
-    "Llama-2-13b-hf:70"
-    "Llama-2-13b-hf:80"
+    "Llama-3.2-3B:50"
+    "Llama-3.2-3B:70"
+    "Llama-3.1-8B:50"
+    "Llama-3.1-8B:70"
 )
 
 for CONFIG in "${CONFIGS[@]}"; do
     MODEL_SHORT="${CONFIG%%:*}"
     SPARSITY="${CONFIG##*:}"
-    
+
     MODEL_DIR="$RESULTS_DIR/${MODEL_SHORT}_sp${SPARSITY}"
-    EVAL_LOG="$RESULTS_DIR/${MODEL_SHORT}_sp${SPARSITY}_zeroshot.json"
-    
+
     if [ ! -d "$MODEL_DIR" ]; then
         echo "WARNING: $MODEL_DIR not found. Skipping. Run run_sparsellm.sh first."
         continue
     fi
-    
+
     echo "========================================"
     echo "Zero-shot eval: $MODEL_SHORT @ ${SPARSITY}% sparsity"
     echo "========================================"
-    
+
     lm_eval \
         --model hf \
         --model_args pretrained="$MODEL_DIR",dtype=float16 \
-        --tasks "$TASKS" \
+        --tasks "$ZEROSHOT_TASKS" \
         --batch_size auto \
         --num_fewshot 0 \
-        --output_path "$EVAL_LOG" \
+        --output_path "$RESULTS_DIR/${MODEL_SHORT}_sp${SPARSITY}_zeroshot.json" \
         2>&1 | tee "$RESULTS_DIR/${MODEL_SHORT}_sp${SPARSITY}_zeroshot.log"
-    
-    echo "Results saved to: $EVAL_LOG"
+
+    echo "========================================"
+    echo "5-shot eval: $MODEL_SHORT @ ${SPARSITY}% sparsity"
+    echo "========================================"
+
+    lm_eval \
+        --model hf \
+        --model_args pretrained="$MODEL_DIR",dtype=float16 \
+        --tasks "$FEWSHOT_TASKS" \
+        --batch_size auto \
+        --num_fewshot 5 \
+        --output_path "$RESULTS_DIR/${MODEL_SHORT}_sp${SPARSITY}_fewshot.json" \
+        2>&1 | tee "$RESULTS_DIR/${MODEL_SHORT}_sp${SPARSITY}_fewshot.log"
+
     echo ""
 done
 
 echo "============================================"
-echo "All zero-shot evaluations complete!"
+echo "All evaluations complete!"
 echo "Results directory: $RESULTS_DIR"
 echo "============================================"

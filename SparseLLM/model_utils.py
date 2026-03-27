@@ -25,7 +25,9 @@ def get_llama(args):
     torch.nn.init.uniform_ = skip
     torch.nn.init.normal_ = skip
     model = LlamaForCausalLM.from_pretrained(args.model, torch_dtype='auto')
-    model.seqlen = 2048
+    # Use 2048 for calibration (matches SparseGPT/WANDA setup)
+    # even if model supports longer context
+    model.seqlen = min(getattr(model.config, 'max_position_embeddings', 2048), 2048)
     return model
 
 @torch.no_grad()
