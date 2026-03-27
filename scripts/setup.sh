@@ -17,7 +17,8 @@ echo "Activating virtual environment..."
 source "$VENV_DIR/bin/activate"
 
 echo "Installing dependencies..."
-pip install torch transformers datasets numpy pandas huggingface_hub wandb lm-eval
+pip install torch --index-url https://download.pytorch.org/whl/cu124
+pip install transformers==4.45.1 datasets numpy pandas huggingface_hub wandb lm-eval
 
 echo ""
 echo "Setup complete!"
