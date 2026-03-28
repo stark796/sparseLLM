@@ -455,7 +455,7 @@ def llama_sparsellm(model, dataloader, dev, args):
             X = torch.stack(X_list, dim=0)
             Y = torch.stack(Y_list, dim=0)
             # Reshape to 2D
-            X, Y = X.reshape((-1, X.size(-1))).T, Y.reshape((-1, Y.size(-1))).T
+            X, Y = X.reshape((-1, X.size(-1))).T.float(), Y.reshape((-1, Y.size(-1))).T.float()
 
             # free memory 
             X_list, Y_list = None, None
@@ -480,9 +480,9 @@ def llama_sparsellm(model, dataloader, dev, args):
             gpts['mlp.gate_proj'].batch_out.clear()
 
             # Reshape auxiliary variables
-            z = z.reshape((-1, z.size(-1))).T.to(dev)
-            p = p.reshape((-1, p.size(-1))).T.to(dev)
-            s = s.reshape((-1, s.size(-1))).T.to(dev)
+            z = z.reshape((-1, z.size(-1))).T.to(dev).float()
+            p = p.reshape((-1, p.size(-1))).T.to(dev).float()
+            s = s.reshape((-1, s.size(-1))).T.to(dev).float()
 
             torch.cuda.empty_cache()
 
