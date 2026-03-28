@@ -487,7 +487,7 @@ def llama_sparsellm(model, dataloader, dev, args):
             torch.cuda.empty_cache()
 
             # Pre-compute the pinverse of X and cache it to save computational cost
-            Xinv = torch.pinverse(X.to(dtype=torch.float32)).half()
+            Xinv = torch.pinverse(X.to(dtype=torch.float32))
 
             # list to store training losses
             training_loss = {'Y_p_loss': [], 'p_z_loss': [], 'z_X_loss': [], 'train_loss': []}
@@ -508,7 +508,7 @@ def llama_sparsellm(model, dataloader, dev, args):
                     del weight_matrix_1
 
                     # Update the weight matrix of mlp.down_proj
-                    pinv = torch.pinverse(p.to(dtype=torch.float32)).half()
+                    pinv = torch.pinverse(p.to(dtype=torch.float32))
                     # Calculate the weight matrix
                     weight_matrix_2 = torch.matmul(Y, pinv)
                     # assign the new parameters to gpts class
@@ -569,7 +569,7 @@ def llama_sparsellm(model, dataloader, dev, args):
                 next_weight = subset['mlp.down_proj'].weight
                 m1 = beta * torch.matmul(next_weight.T, next_weight)
                 m2 = gamma * torch.eye(m1.shape[0], device=m1.device)
-                av = torch.inverse(m1 + m2).to(dtype=torch.float16)
+                av = torch.inverse(m1 + m2)
 
                 del m1, m2
                 torch.cuda.empty_cache()
@@ -630,7 +630,7 @@ def llama_sparsellm(model, dataloader, dev, args):
                         loss_s.backward()
                         s_batch -= s_learning_rate * s_batch.grad                    
                         s_batch.grad.zero_()
-                        s[:,chunk] = s_batch.detach().to(dtype=torch.float16)
+                        s[:,chunk] = s_batch.detach()
 
                 s_batch, X_batch, z_batch, p_batch, w = s_batch.detach(), X_batch.detach(), z_batch.detach(), p_batch.detach(), w.detach()
                 del w, loss_s, s_batch, X_batch, z_batch, p_batch
