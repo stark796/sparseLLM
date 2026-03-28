@@ -25,7 +25,7 @@ MODELS=(
 SPARSITIES=(0.5 0.7)
 
 # Calibration samples (SparseLLM paper uses 32-64)
-NSAMPLES=32
+NSAMPLES=16
 
 # --- Run Experiments ---
 for MODEL in "${MODELS[@]}"; do
