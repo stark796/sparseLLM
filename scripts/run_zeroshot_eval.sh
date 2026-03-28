@@ -24,9 +24,7 @@ FEWSHOT_TASKS="mmlu,gpqa,medmcqa"
 
 # Configs: model:sparsity (must match run_sparsellm.sh)
 CONFIGS=(
-    "Llama-3.2-3B:50"
     "Llama-3.2-3B:70"
-    "Llama-3.1-8B:50"
     "Llama-3.1-8B:70"
 )
 

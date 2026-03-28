@@ -22,7 +22,7 @@ MODELS=(
 )
 
 # Sparsity levels matching DART Table 1
-SPARSITIES=(0.5 0.7)
+SPARSITIES=(0.7)
 
 # Calibration samples (SparseLLM paper uses 32-64)
 NSAMPLES=16
