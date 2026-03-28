@@ -566,7 +566,7 @@ def llama_sparsellm(model, dataloader, dev, args):
                 ##############
 
                 # Activation inverse
-                next_weight = subset['mlp.down_proj'].weight
+                next_weight = subset['mlp.down_proj'].weight.float()
                 m1 = beta * torch.matmul(next_weight.T, next_weight)
                 m2 = gamma * torch.eye(m1.shape[0], device=m1.device)
                 av = torch.inverse(m1 + m2)
@@ -591,7 +591,7 @@ def llama_sparsellm(model, dataloader, dev, args):
                 # optimize z
                 ##############
 
-                w = subset['mlp.up_proj'].weight
+                w = subset['mlp.up_proj'].weight.float()
                 m = torch.matmul(w, X)
                 swish = nn.functional.silu(s)
                 z = (m + swish * p) / (swish ** 2 + 1)    
