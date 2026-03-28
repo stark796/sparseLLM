@@ -637,9 +637,9 @@ def llama_sparsellm(model, dataloader, dev, args):
                 torch.cuda.empty_cache()
 
                 # compute and save the training loss after each epoch
-                tmp_training_loss = nn.functional.mse_loss(torch.matmul(subset['mlp.down_proj'].weight, 
-                                                                        nn.functional.silu(torch.matmul(subset['mlp.gate_proj'].weight, X)) 
-                                                                        * torch.matmul(subset['mlp.up_proj'].weight, X)), Y)
+                tmp_training_loss = nn.functional.mse_loss(torch.matmul(subset['mlp.down_proj'].weight.float(), 
+                                                                        nn.functional.silu(torch.matmul(subset['mlp.gate_proj'].weight.float(), X)) 
+                                                                        * torch.matmul(subset['mlp.up_proj'].weight.float(), X)), Y)
                 training_loss['train_loss'].append(tmp_training_loss.item())
 
         for j in range(args.nsamples):
