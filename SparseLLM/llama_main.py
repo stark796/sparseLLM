@@ -35,7 +35,7 @@ def main():
     if (args.sparsity or args.prunen) and not args.gmp:
         llama_sparsellm(model, dataloader, torch.device('cuda'), args)
 
-    for dataset in ['wikitext2', 'ptb', 'c4']:
+    for dataset in ['wikitext2', 'c4']:
         dataloader, testloader = get_loaders(dataset, seed=args.seed, model=args.model, seqlen=model.seqlen)
         llama_eval(model, testloader, torch.device('cuda'), args, dataset)
 
