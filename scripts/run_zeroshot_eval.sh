@@ -39,13 +39,19 @@ for CONFIG in "${CONFIGS[@]}"; do
         continue
     fi
 
+    # Map short name to HF model ID for tokenizer
+    case "$MODEL_SHORT" in
+        Llama-3.2-3B) HF_MODEL="meta-llama/Llama-3.2-3B" ;;
+        Llama-3.1-8B) HF_MODEL="meta-llama/Llama-3.1-8B" ;;
+    esac
+
     echo "========================================"
     echo "Zero-shot eval: $MODEL_SHORT @ ${SPARSITY}% sparsity"
     echo "========================================"
 
     lm_eval \
         --model hf \
-        --model_args pretrained="$MODEL_DIR",dtype=float16 \
+        --model_args pretrained="$MODEL_DIR",tokenizer="$HF_MODEL",dtype=float16 \
         --tasks "$ZEROSHOT_TASKS" \
         --batch_size auto \
         --num_fewshot 0 \
@@ -58,7 +64,7 @@ for CONFIG in "${CONFIGS[@]}"; do
 
     lm_eval \
         --model hf \
-        --model_args pretrained="$MODEL_DIR",dtype=float16 \
+        --model_args pretrained="$MODEL_DIR",tokenizer="$HF_MODEL",dtype=float16 \
         --tasks "$FEWSHOT_TASKS" \
         --batch_size auto \
         --num_fewshot 5 \
