@@ -51,7 +51,7 @@ for CONFIG in "${CONFIGS[@]}"; do
 
     lm_eval \
         --model hf \
-        --model_args pretrained="$MODEL_DIR",tokenizer="$HF_MODEL",dtype=float16 \
+        --model_args pretrained="$MODEL_DIR",tokenizer="$HF_MODEL" \
         --tasks "$ZEROSHOT_TASKS" \
         --batch_size auto \
         --num_fewshot 0 \
@@ -64,7 +64,7 @@ for CONFIG in "${CONFIGS[@]}"; do
 
     lm_eval \
         --model hf \
-        --model_args pretrained="$MODEL_DIR",tokenizer="$HF_MODEL",dtype=float16 \
+        --model_args pretrained="$MODEL_DIR",tokenizer="$HF_MODEL" \
         --tasks "$FEWSHOT_TASKS" \
         --batch_size auto \
         --num_fewshot 5 \
